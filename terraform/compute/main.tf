@@ -134,11 +134,9 @@ resource "aws_launch_template" "web" {
               </head>
               <body>
                   <div class="container">
-                      <h1>🚀 Infrastructure as Code Platform</h1>
-                      <p>Environment: ${var.environment}</p>
-                      <p>Managed by: Terraform</p>
-                      <p>Instance ID: $(ec2-metadata --instance-id | cut -d ' ' -f 2)</p>
-                      <p>Availability Zone: $(ec2-metadata --availability-zone | cut -d ' ' -f 2)</p>
+                      <h1>Infrastructure as Code Platform</h1>
+                      <p>Feel free to use this as a template</p>
+                       <p>Love, Dorcas</p>
                   </div>
               </body>
               </html>
