@@ -21,7 +21,7 @@ The platform was built to demonstrate practical skills in cloud architecture, in
 
 ## Architecture
 
-![Infrastructure Architecture](docs/images/architecture-diagram.png)
+![Infrastructure Architecture](docs/images/aws-infrastructure-architecture.png)
 
 *Multi-AZ architecture with auto-scaling compute layer, monitoring, and centralized state management*
 
