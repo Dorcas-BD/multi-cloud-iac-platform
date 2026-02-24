@@ -2,7 +2,7 @@
 
 A production-grade infrastructure platform built with Terraform and AWS. This project demonstrates automated cloud infrastructure provisioning, auto-scaling capabilities, and enterprise-level infrastructure management practices.
 
-Live Demo: http://13.223.93.35
+Live Demo: http://3.232.133.225
 
 ## Overview
 
