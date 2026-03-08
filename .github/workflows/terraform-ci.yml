@@ -1,0 +1,129 @@
+name: Terraform CI/CD
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'terraform/**'
+      - '.github/workflows/terraform-ci.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'terraform/**'
+
+jobs:
+  terraform-validate:
+    name: Terraform Validation
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.0
+
+      - name: Terraform Format Check
+        id: fmt
+        run: terraform fmt -check -recursive
+        continue-on-error: true
+
+      - name: Validate Backend
+        working-directory: ./terraform/backend
+        run: |
+          terraform init -backend=false
+          terraform validate
+
+      - name: Validate Networking
+        working-directory: ./terraform/networking
+        run: |
+          terraform init -backend=false
+          terraform validate
+
+      - name: Validate Compute
+        working-directory: ./terraform/compute
+        run: |
+          terraform init -backend=false
+          terraform validate
+
+      - name: Comment Format Status
+        if: steps.fmt.outcome == 'failure'
+        run: |
+          echo "::warning::Terraform files are not properly formatted. Run 'terraform fmt -recursive' locally."
+
+  security-scan:
+    name: Security Scanning
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run tfsec
+        uses: aquasecurity/tfsec-action@v1.0.0
+        with:
+          working_directory: terraform
+          soft_fail: true
+
+      - name: Run Checkov
+        uses: bridgecrewio/checkov-action@master
+        with:
+          directory: terraform
+          framework: terraform
+          soft_fail_on: true
+          output_format: cli
+
+  documentation-check:
+    name: Documentation Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check README exists
+        run: |
+          if [ ! -f "README.md" ]; then
+            echo "::error::README.md not found"
+            exit 1
+          fi
+          echo "✓ README.md exists"
+
+      - name: Check Architecture Diagram
+        run: |
+          if [ ! -f "docs/images/aws-infracture-architecture.png" ]; then
+            echo "::warning::Architecture diagram not found at docs/images/aws-infracture-architecture.png"
+          else
+            echo "✓ Architecture diagram exists"
+          fi
+
+      - name: Check Documentation Files
+        run: |
+          for file in docs/architecture.md docs/setup.md; do
+            if [ -f "$file" ]; then
+              echo "✓ $file exists"
+            else
+              echo "::warning::$file not found"
+            fi
+          done
+
+  cost-estimation:
+    name: Cost Estimation
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Infracost
+        uses: infracost/actions/setup@v2
+        with:
+          api-key: ${{ secrets.INFRACOST_API_KEY }}
+
+      - name: Generate cost estimate
+        run: |
+          echo "Cost estimation requires Infracost API key"
+          echo "Visit https://www.infracost.io/docs/ to set up"
