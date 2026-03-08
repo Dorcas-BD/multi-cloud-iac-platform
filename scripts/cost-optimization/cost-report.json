@@ -1,0 +1,17 @@
+{
+  "scan_date": "2026-03-08T18:08:55.884653",
+  "region": "us-east-1",
+  "total_findings": 1,
+  "potential_monthly_savings": 0,
+  "potential_yearly_savings": 0,
+  "findings": [
+    {
+      "resource": "EC2 Instance",
+      "id": "i-0ce8268e5409c4be0",
+      "type": "t3.micro",
+      "avg_cpu_7d": "0.30%",
+      "issue": "Very low CPU utilization",
+      "recommendation": "Consider downsizing or spot instances"
+    }
+  ]
+}
