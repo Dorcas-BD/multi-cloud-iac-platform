@@ -1,7 +1,7 @@
 variable "aws_region" {
   description = "AWS region"
   type        = string
-  default     = "us-east-1"  
+  default     = "us-east-1"
 }
 
 variable "project_name" {
@@ -19,7 +19,7 @@ variable "environment" {
 variable "instance_type" {
   description = "EC2 instance type"
   type        = string
-  default     = "t3.micro"  # Free tier eligible
+  default     = "t3.micro" # Free tier eligible
 }
 
 variable "desired_capacity" {
@@ -43,5 +43,5 @@ variable "max_size" {
 variable "allowed_ssh_cidr" {
   description = "CIDR block allowed to SSH (use your IP)"
   type        = string
-  default     = "0.0.0.0/0"  # Change this to your IP for security
+  default     = "0.0.0.0/0" # Change this to your IP for security
 }

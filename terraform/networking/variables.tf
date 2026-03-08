@@ -1,7 +1,7 @@
 variable "aws_region" {
   description = "AWS region"
   type        = string
-  default     = "us-east-1" 
+  default     = "us-east-1"
 }
 
 
@@ -38,11 +38,11 @@ variable "private_subnet_cidrs" {
 variable "availability_zones" {
   description = "Availability zones"
   type        = list(string)
-  default     = ["us-east-1a", "us-east-1b"]  
+  default     = ["us-east-1a", "us-east-1b"]
 }
 
 variable "enable_nat_gateway" {
   description = "Enable NAT gateway (costs ~$30/month)"
   type        = bool
-  default     = false  # Set false for dev to save money
+  default     = false # Set false for dev to save money
 }

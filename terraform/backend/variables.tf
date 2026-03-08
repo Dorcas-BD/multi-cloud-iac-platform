@@ -8,7 +8,7 @@ variable "state_bucket_name" {
   description = "Name of S3 bucket for Terraform state"
   type        = string
   # Must be globally unique - add your name/random string
-  default     = "terraform-state-yourname-12345"
+  default = "terraform-state-yourname-12345"
 }
 
 variable "lock_table_name" {

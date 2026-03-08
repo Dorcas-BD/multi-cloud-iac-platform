@@ -6,8 +6,8 @@ terraform {
       version = "~> 5.0"
     }
   }
-  
-backend "s3" {
+
+  backend "s3" {
     bucket         = "terraform-state-yourname-12345"
     key            = "compute/dev/terraform.tfstate"
     region         = "us-east-1"
@@ -18,7 +18,7 @@ backend "s3" {
 
 provider "aws" {
   region = var.aws_region
-  
+
   default_tags {
     tags = {
       Project     = var.project_name
@@ -31,7 +31,7 @@ provider "aws" {
 # Data source to get VPC info from networking layer
 data "terraform_remote_state" "networking" {
   backend = "s3"
-  
+
   config = {
     bucket = "terraform-state-yourname-12345"
     key    = "networking/dev/terraform.tfstate"
@@ -43,12 +43,12 @@ data "terraform_remote_state" "networking" {
 data "aws_ami" "amazon_linux" {
   most_recent = true
   owners      = ["amazon"]
-  
+
   filter {
     name   = "name"
     values = ["al2023-ami-*-x86_64"]
   }
-  
+
   filter {
     name   = "virtualization-type"
     values = ["hvm"]
@@ -58,11 +58,11 @@ data "aws_ami" "amazon_linux" {
 # Security group for web servers
 module "web_sg" {
   source = "../modules/security-group"
-  
+
   name_prefix = "${var.project_name}-${var.environment}-web"
   description = "Security group for web servers"
   vpc_id      = data.terraform_remote_state.networking.outputs.vpc_id
-  
+
   ingress_rules = [
     {
       from_port   = 80
@@ -86,7 +86,7 @@ module "web_sg" {
       description = "Allow SSH from specific IP"
     }
   ]
-  
+
   egress_rules = [
     {
       from_port   = 0
@@ -96,7 +96,7 @@ module "web_sg" {
       description = "Allow all outbound traffic"
     }
   ]
-  
+
   tags = {
     Name = "${var.project_name}-${var.environment}-web-sg"
   }
@@ -107,12 +107,12 @@ resource "aws_launch_template" "web" {
   name_prefix   = "${var.project_name}-${var.environment}-web-"
   image_id      = data.aws_ami.amazon_linux.id
   instance_type = var.instance_type
-  
+
   network_interfaces {
     associate_public_ip_address = true
-    security_groups            = [module.web_sg.security_group_id]
+    security_groups             = [module.web_sg.security_group_id]
   }
-  
+
   user_data = base64encode(<<-EOF
               #!/bin/bash
               yum update -y
@@ -143,14 +143,14 @@ resource "aws_launch_template" "web" {
               HTML
               EOF
   )
-  
+
   tag_specifications {
     resource_type = "instance"
     tags = {
       Name = "${var.project_name}-${var.environment}-web-instance"
     }
   }
-  
+
   lifecycle {
     create_before_destroy = true
   }
@@ -163,21 +163,21 @@ resource "aws_autoscaling_group" "web" {
   max_size            = var.max_size
   min_size            = var.min_size
   vpc_zone_identifier = data.terraform_remote_state.networking.outputs.public_subnet_ids
-  
+
   launch_template {
     id      = aws_launch_template.web.id
     version = "$Latest"
   }
-  
+
   health_check_type         = "EC2"
   health_check_grace_period = 300
-  
+
   tag {
     key                 = "Name"
     value               = "${var.project_name}-${var.environment}-asg-instance"
     propagate_at_launch = true
   }
-  
+
   tag {
     key                 = "Environment"
     value               = var.environment
@@ -204,11 +204,11 @@ resource "aws_cloudwatch_metric_alarm" "cpu_high" {
   period              = "120"
   statistic           = "Average"
   threshold           = "70"
-  
+
   dimensions = {
     AutoScalingGroupName = aws_autoscaling_group.web.name
   }
-  
+
   alarm_description = "This metric monitors EC2 CPU utilization"
   alarm_actions     = [aws_autoscaling_policy.scale_up.arn]
 }
@@ -232,11 +232,11 @@ resource "aws_cloudwatch_metric_alarm" "cpu_low" {
   period              = "120"
   statistic           = "Average"
   threshold           = "30"
-  
+
   dimensions = {
     AutoScalingGroupName = aws_autoscaling_group.web.name
   }
-  
+
   alarm_description = "This metric monitors EC2 CPU utilization"
   alarm_actions     = [aws_autoscaling_policy.scale_down.arn]
 }

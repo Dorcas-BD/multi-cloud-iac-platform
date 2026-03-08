@@ -6,7 +6,7 @@ terraform {
       version = "~> 5.0"
     }
   }
-  
+
   backend "s3" {
     bucket         = "terraform-state-yourname-12345"
     key            = "networking/dev/terraform.tfstate"
@@ -18,7 +18,7 @@ terraform {
 
 provider "aws" {
   region = var.aws_region
-  
+
   default_tags {
     tags = {
       Project     = var.project_name
@@ -31,7 +31,7 @@ provider "aws" {
 
 module "vpc" {
   source = "../modules/vpc"
-  
+
   project_name         = var.project_name
   environment          = var.environment
   vpc_cidr             = var.vpc_cidr

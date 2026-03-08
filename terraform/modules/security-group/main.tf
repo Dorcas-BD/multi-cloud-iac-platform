@@ -17,14 +17,14 @@ resource "aws_security_group" "main" {
 resource "aws_security_group_rule" "ingress" {
   count = length(var.ingress_rules)
 
-  type              = "ingress"
-  from_port         = var.ingress_rules[count.index].from_port
-  to_port           = var.ingress_rules[count.index].to_port
-  protocol          = var.ingress_rules[count.index].protocol
-  cidr_blocks       = lookup(var.ingress_rules[count.index], "cidr_blocks", null)
+  type                     = "ingress"
+  from_port                = var.ingress_rules[count.index].from_port
+  to_port                  = var.ingress_rules[count.index].to_port
+  protocol                 = var.ingress_rules[count.index].protocol
+  cidr_blocks              = lookup(var.ingress_rules[count.index], "cidr_blocks", null)
   source_security_group_id = lookup(var.ingress_rules[count.index], "source_security_group_id", null)
-  description       = lookup(var.ingress_rules[count.index], "description", "")
-  security_group_id = aws_security_group.main.id
+  description              = lookup(var.ingress_rules[count.index], "description", "")
+  security_group_id        = aws_security_group.main.id
 }
 
 # Egress rules (outgoing traffic)
